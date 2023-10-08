@@ -38,9 +38,3 @@ class DAG:
                 self.dag.remove_node(node)
         
         return divisions    
-    
-    def plot(self):
-        pos = nx.spring_layout(self.dag)
-        nx.draw(self.dag, pos, with_labels=True, node_size=1000, node_color="lightblue", font_size=12, font_color="black")
-        plt.title("Directed Acyclic Graph (DAG)")
-        plt.show()
