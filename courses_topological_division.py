@@ -8,6 +8,6 @@ if dag.is_dag():
 
     # Print the divisions
     for i, division in enumerate(divisions):
-        print(f"Level {i + 1}: {[course.course_name for course in division]}")
+        print(f"S{i + 1}: {[course.course_name for course in division]}")
 else:
     print("The graph is not a DAG.")
