@@ -15,30 +15,27 @@ class DAG:
         return nx.is_directed_acyclic_graph(self.dag)
         
     def topological_division(self):
-        stack1 = []
-        stack2 = []
+        if not self.is_dag:
+            return None
         
-        for node, in_degree in self.dag.in_degree():
-            if in_degree == 0:
-                stack1.append(node)
-            
-        while stack1:
-            node = stack1.pop()
-            stack2.append(node)
-            
-            self.dag.remove_node(node)
-            
-            for new_0_in_degree_node, in_degree in self.dag.in_degree():
-                if in_degree == 0:
-                    stack1.append(new_0_in_degree_node)
-                    
+        # List to store nodes at each division
         divisions = []
-        while stack2:
-            division = []
-            while stack2:
-                node = stack2.pop()
-                division.append(node)
-            divisions.append(division)
+        
+        while True:
+            # Find nodes with in-degrees of 0
+            zero_in_degree_nodes = [node for node, in_degree in self.dag.in_degree() if in_degree == 0]
+            
+            # Break if there are no nodes with in-degree of 0
+            # Indicating the process has completed
+            if not zero_in_degree_nodes:
+                break
+            
+            # Store this level of nodes into list
+            divisions.append(zero_in_degree_nodes)       
+            
+            # Remove all the 0 in-degree nodes
+            for node in zero_in_degree_nodes:
+                self.dag.remove_node(node)
         
         return divisions    
     
