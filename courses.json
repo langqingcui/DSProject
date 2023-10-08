@@ -1,62 +1,75 @@
-[
-    {
-      "课程名称": "计算机基础",
-      "学分": 3,
-      "先修课程": []
-    },
-    {
-      "课程名称": "数据结构与算法",
-      "学分": 4,
-      "先修课程": ["计算机基础"]
-    },
-    {
-      "课程名称": "操作系统",
-      "学分": 4,
-      "先修课程": ["数据结构与算法"]
-    },
-    {
-      "课程名称": "数据库管理",
-      "学分": 3,
-      "先修课程": ["数据结构与算法"]
-    },
-    {
-      "课程名称": "计算机网络",
-      "学分": 4,
-      "先修课程": ["数据结构与算法"]
-    },
-    {
-      "课程名称": "人工智能",
-      "学分": 4,
-      "先修课程": ["数据结构与算法"]
-    },
-    {
-      "课程名称": "软件工程",
-      "学分": 3,
-      "先修课程": ["数据结构与算法"]
-    },
-    {
-      "课程名称": "编程语言理论",
-      "学分": 3,
-      "先修课程": ["数据结构与算法"]
-    },
-    {
-      "课程名称": "分布式系统",
-      "学分": 4,
-      "先修课程": ["操作系统", "计算机网络"]
-    },
-    {
-      "课程名称": "计算机安全",
-      "学分": 3,
-      "先修课程": ["操作系统"]
-    },
-    {
-      "课程名称": "图形学",
-      "学分": 3,
-      "先修课程": ["计算机基础", "数据结构与算法"]
-    },
-    {
-      "课程名称": "机器学习",
-      "学分": 4,
-      "先修课程": ["数据结构与算法", "人工智能"]
-    }
-]
+{
+    "computer_science_courses": [
+      {
+        "course_name": "Introduction to Programming",
+        "course_credits": 3,
+        "prerequisites": []
+      },
+      {
+        "course_name": "Data Structures and Algorithms",
+        "course_credits": 4,
+        "prerequisites": ["Introduction to Programming"]
+      },
+      {
+        "course_name": "Computer Organization and Architecture",
+        "course_credits": 3,
+        "prerequisites": ["Introduction to Programming"]
+      },
+      {
+        "course_name": "Operating Systems",
+        "course_credits": 3,
+        "prerequisites": ["Data Structures and Algorithms"]
+      },
+      {
+        "course_name": "Database Management Systems",
+        "course_credits": 3,
+        "prerequisites": ["Data Structures and Algorithms"]
+      },
+      {
+        "course_name": "Software Engineering",
+        "course_credits": 3,
+        "prerequisites": ["Data Structures and Algorithms"]
+      },
+      {
+        "course_name": "Artificial Intelligence",
+        "course_credits": 3,
+        "prerequisites": ["Data Structures and Algorithms"]
+      },
+      {
+        "course_name": "Web Development",
+        "course_credits": 3,
+        "prerequisites": ["Data Structures and Algorithms"]
+      },
+      {
+        "course_name": "Computer Networks",
+        "course_credits": 3,
+        "prerequisites": ["Data Structures and Algorithms"]
+      },
+      {
+        "course_name": "Distributed Systems",
+        "course_credits": 3,
+        "prerequisites": ["Operating Systems", "Computer Networks"]
+      },
+      {
+        "course_name": "Machine Learning",
+        "course_credits": 3,
+        "prerequisites": ["Data Structures and Algorithms", "Artificial Intelligence", "Statistics"]
+      },
+      {
+        "course_name": "Compilers",
+        "course_credits": 3,
+        "prerequisites": ["Operating Systems", "Computer Organization and Architecture"]
+      },
+      {
+        "course_name": "Cybersecurity",
+        "course_credits": 3,
+        "prerequisites": ["Computer Networks"]
+      },
+      {
+        "course_name": "Parallel Computing",
+        "course_credits": 3,
+        "prerequisites": ["Operating Systems", "Computer Organization and Architecture"]
+      }
+    ]
+  }
+  
