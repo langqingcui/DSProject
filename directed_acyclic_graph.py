@@ -39,10 +39,6 @@ class DAG:
         # List to store nodes at each division
         divisions = []
 
-        # Initialize variables to keep track of credits and courses in the current semester
-        current_semester_credits = 0
-        current_semester_courses = []
-
         while True:
             # Find nodes with in-degrees of 0
             zero_in_degree_nodes = [node for node, in_degree in self.dag.in_degree() if in_degree == 0]
@@ -51,26 +47,28 @@ class DAG:
             # Indicating the process has completed
             if not zero_in_degree_nodes:
                 break
+            
+            # Initialize variables to keep track of credits and courses in the current semester
+            current_semester_credits = 0
+            current_semester_courses = []
 
-            # Calculate the total credits of courses in the current semester
-            total_credits_in_semester = sum([course.credits for course in current_semester_courses])
+            for node in zero_in_degree_nodes:
+                # Calculate the total credits of courses in the current semester
+                total_credits_in_semester = sum([course.credits for course in current_semester_courses])
 
-            # Check if adding the next course will exceed the 20-credit limit
-            if total_credits_in_semester + zero_in_degree_nodes[0].credits <= 14:
-                # Add the course to the current semester
-                current_semester_courses.append(zero_in_degree_nodes[0])
-                current_semester_credits += zero_in_degree_nodes[0].credits
-            else:
-                # If adding the course would exceed the credit limit, start a new semester
-                divisions.append(current_semester_courses)
-                current_semester_courses = [zero_in_degree_nodes[0]]
-                current_semester_credits = zero_in_degree_nodes[0].credits
+                # Check if adding the next course will exceed the 14-credit limit
+                if total_credits_in_semester + node.credits <= 10:
+                    # Add the course to the current semester
+                    current_semester_courses.append(node)
+                    current_semester_credits += node.credits
+                else:
+                    break  # Break if the credit limit is reached
 
-            # Remove the course from the graph
-            self.dag.remove_node(zero_in_degree_nodes[0])
+            # Remove the courses that are already planned for current semester
+            self.dag.remove_nodes_from(current_semester_courses)
 
-        # Add the last semester's courses to the divisions
-        if current_semester_courses:
+            # Store the current semester's courses in divisions
             divisions.append(current_semester_courses)
 
         return divisions
+
