@@ -57,7 +57,7 @@ class DAG:
                 total_credits_in_semester = sum([course.credits for course in current_semester_courses])
 
                 # Check if adding the next course will exceed the 14-credit limit
-                if total_credits_in_semester + node.credits <= 10:
+                if total_credits_in_semester + node.credits <= 14:
                     # Add the course to the current semester
                     current_semester_courses.append(node)
                     current_semester_credits += node.credits
