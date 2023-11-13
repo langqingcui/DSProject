@@ -9,16 +9,17 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QTextEdit,
-    QGroupBox
+    QGroupBox,
     )
 from PySide6.QtGui import QPixmap
+from courses_topological_division import generate_course_divisions
 
 class LoginWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
         self.setWindowTitle('课程编排系统-登录')
-        self.setGeometry(300, 300, 300, 150)
+        self.resize(300, 150)
         
         self.logo_label = QLabel(self)
         pixmap = QPixmap('bjut.png') 
@@ -61,7 +62,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Course Planner")
-        self.setGeometry(100, 100, 800, 600)
+        self.resize(800, 600)
 
         # Main horizontal layout
         main_layout = QHBoxLayout()
@@ -119,15 +120,20 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
     def import_data(self):
-        # Logic to import course info from courses.json
         pass
 
     def generate_division(self):
-        # Logic to generate course topological division
-        pass
+        divisions = generate_course_divisions()
+
+        if divisions:
+            # Update each word box with the courses for each semester
+            for i, division in enumerate(divisions):
+                course_names = [course.course_name for course in division]
+                self.semester_boxes[i].setPlainText('\n'.join(course_names))
+        else:
+            print("Unable to generate course divisions.")
 
     def export_data(self):
-        # Logic to export the topological division to an excel
         pass
 
 
