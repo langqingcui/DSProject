@@ -10,6 +10,8 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QTextEdit,
     QGroupBox,
+    QDialog,
+    QComboBox
     )
 from PySide6.QtGui import QPixmap
 from courses_topological_division import generate_course_divisions
@@ -86,12 +88,17 @@ class MainWindow(QMainWindow):
         button_layout.addWidget(self.export_button)
         self.export_button.clicked.connect(self.export_data)
         
+        # Clear button
+        self.clear_button = QPushButton("清空排课")
+        button_layout.addWidget(self.clear_button)
+        self.clear_button.clicked.connect(self.clearAllWordBoxes)
+        
         button_layout.addStretch()
 
         # Widget to hold the buttons
         button_widget = QWidget()
         button_widget.setLayout(button_layout)
-        button_widget.setFixedWidth(100)  # Set a fixed width for the button area
+        button_widget.setFixedWidth(100) 
 
         # Add the button layout to the main layout
         main_layout.addWidget(button_widget)
@@ -123,18 +130,67 @@ class MainWindow(QMainWindow):
         pass
 
     def generate_division(self):
-        divisions = generate_course_divisions()
+        dialog = MaxCreditDialog(self)
+        result = dialog.exec()
+        
+        if result == QDialog.Accepted:
+            max_credits = dialog.selected_credits()
+        
+            divisions = generate_course_divisions()
 
-        if divisions:
-            # Update each word box with the courses for each semester
-            for i, division in enumerate(divisions):
-                course_names = [course.course_name for course in division]
-                self.semester_boxes[i].setPlainText('\n'.join(course_names))
-        else:
-            print("Unable to generate course divisions.")
+            if divisions:
+                # Update each word box with the courses for each semester
+                for i, division in enumerate(divisions):
+                    course_names = [course.course_name for course in division]
+                    self.semester_boxes[i].setPlainText('，'.join(course_names))
+            else:
+                print("Unable to generate course divisions.")
 
     def export_data(self):
         pass
+    
+    def clearAllWordBoxes(self):
+        for box in self.semester_boxes:
+            box.clear()
+
+class MaxCreditDialog(QDialog):
+    def __init__(self, parent=None):
+        super(MaxCreditDialog, self).__init__(parent)
+        
+        self.setWindowTitle("学分数")
+        
+        label = QLabel("每学期最大学分：")
+        
+        # Create the combo box that select max credits
+        self.creditComboBox = QComboBox()
+        for i in range(16, 26):  # Add credit options from 16 to 25
+            self.creditComboBox.addItem(str(i))
+            
+        # Create the confirm and cancel button
+        self.confirmButton = QPushButton("确定")
+        self.confirmButton.clicked.connect(self.accept)
+        self.cancelButton = QPushButton("取消")
+        self.cancelButton.clicked.connect(self.reject)
+        
+        # Layout for the combo box and label
+        comboLayout = QHBoxLayout()
+        comboLayout.addWidget(label)
+        comboLayout.addWidget(self.creditComboBox)
+        
+        # Layout for buttons
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(self.confirmButton)
+        buttonLayout.addWidget(self.cancelButton)
+        
+        # Main layout
+        mainLayout = QVBoxLayout()
+        mainLayout.addLayout(comboLayout)
+        mainLayout.addLayout(buttonLayout)
+        
+        self.setLayout(mainLayout)
+
+    def selected_credits(self):
+        return int(self.creditComboBox.currentText())
 
 
 if __name__ == '__main__':
