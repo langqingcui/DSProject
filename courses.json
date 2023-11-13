@@ -1,75 +1,258 @@
 {
-    "computer_science_courses": [
+  "computer_science_courses": [
       {
-        "course_name": "Introduction to Programming",
-        "course_credits": 3,
-        "prerequisites": []
+          "course_name": "编程导论",
+          "course_credits": 3,
+          "prerequisites": []
       },
       {
-        "course_name": "Data Structures and Algorithms",
-        "course_credits": 4,
-        "prerequisites": ["Introduction to Programming"]
+          "course_name": "数据结构与算法",
+          "course_credits": 4,
+          "prerequisites": [
+              "编程导论"
+          ]
       },
       {
-        "course_name": "Computer Organization and Architecture",
-        "course_credits": 3,
-        "prerequisites": ["Introduction to Programming"]
+          "course_name": "计算机组织与架构",
+          "course_credits": 3,
+          "prerequisites": [
+              "编程导论"
+          ]
       },
       {
-        "course_name": "Operating Systems",
-        "course_credits": 3,
-        "prerequisites": ["Data Structures and Algorithms"]
+          "course_name": "操作系统",
+          "course_credits": 3,
+          "prerequisites": [
+              "数据结构与算法"
+          ]
       },
       {
-        "course_name": "Database Management Systems",
-        "course_credits": 3,
-        "prerequisites": ["Data Structures and Algorithms"]
+          "course_name": "数据库管理系统",
+          "course_credits": 3,
+          "prerequisites": [
+              "数据结构与算法"
+          ]
       },
       {
-        "course_name": "Software Engineering",
-        "course_credits": 3,
-        "prerequisites": ["Data Structures and Algorithms"]
+          "course_name": "软件工程",
+          "course_credits": 3,
+          "prerequisites": [
+              "数据结构与算法"
+          ]
       },
       {
-        "course_name": "Artificial Intelligence",
-        "course_credits": 3,
-        "prerequisites": ["Data Structures and Algorithms"]
+          "course_name": "人工智能",
+          "course_credits": 3,
+          "prerequisites": [
+              "数据结构与算法"
+          ]
       },
       {
-        "course_name": "Web Development",
-        "course_credits": 3,
-        "prerequisites": ["Data Structures and Algorithms"]
+          "course_name": "网页开发",
+          "course_credits": 3,
+          "prerequisites": [
+              "数据结构与算法"
+          ]
       },
       {
-        "course_name": "Computer Networks",
-        "course_credits": 3,
-        "prerequisites": ["Data Structures and Algorithms"]
+          "course_name": "计算机网络",
+          "course_credits": 3,
+          "prerequisites": [
+              "数据结构与算法"
+          ]
       },
       {
-        "course_name": "Distributed Systems",
-        "course_credits": 3,
-        "prerequisites": ["Operating Systems", "Computer Networks"]
+          "course_name": "分布式系统",
+          "course_credits": 3,
+          "prerequisites": [
+              "操作系统",
+              "计算机网络"
+          ]
       },
       {
-        "course_name": "Machine Learning",
-        "course_credits": 3,
-        "prerequisites": ["Data Structures and Algorithms", "Artificial Intelligence", "Statistics"]
+          "course_name": "机器学习",
+          "course_credits": 3,
+          "prerequisites": [
+              "数据结构与算法",
+              "人工智能",
+              "统计学"
+          ]
       },
       {
-        "course_name": "Compilers",
-        "course_credits": 3,
-        "prerequisites": ["Operating Systems", "Computer Organization and Architecture"]
+          "course_name": "编译器",
+          "course_credits": 3,
+          "prerequisites": [
+              "操作系统",
+              "计算机组织与架构"
+          ]
       },
       {
-        "course_name": "Cybersecurity",
-        "course_credits": 3,
-        "prerequisites": ["Computer Networks"]
+          "course_name": "网络安全",
+          "course_credits": 3,
+          "prerequisites": [
+              "计算机网络"
+          ]
       },
       {
-        "course_name": "Parallel Computing",
-        "course_credits": 3,
-        "prerequisites": ["Operating Systems", "Computer Organization and Architecture"]
+          "course_name": "并行计算",
+          "course_credits": 3,
+          "prerequisites": [
+              "操作系统",
+              "计算机组织与架构"
+          ]
+      },
+      {
+          "course_name": "密码学",
+          "course_credits": 3,
+          "prerequisites": [
+              "密码学的数学基础"
+          ]
+      },
+      {
+          "course_name": "信息检索",
+          "course_credits": 3,
+          "prerequisites": [
+              "数据结构与算法"
+          ]
+      },
+      {
+          "course_name": "云计算",
+          "course_credits": 3,
+          "prerequisites": [
+              "分布式系统"
+          ]
+      },
+      {
+          "course_name": "游戏开发",
+          "course_credits": 3,
+          "prerequisites": [
+              "编程导论",
+              "计算机图形学"
+          ]
+      },
+      {
+          "course_name": "计算机图形学",
+          "course_credits": 3,
+          "prerequisites": [
+              "数据结构与算法"
+          ]
+      },
+      {
+          "course_name": "虚拟现实",
+          "course_credits": 3,
+          "prerequisites": [
+              "计算机图形学"
+          ]
+      },
+      {
+          "course_name": "道德黑客",
+          "course_credits": 3,
+          "prerequisites": [
+              "网络安全"
+          ]
+      },
+      {
+          "course_name": "软件测试",
+          "course_credits": 3,
+          "prerequisites": [
+              "软件工程"
+          ]
+      },
+      {
+          "course_name": "数据挖掘",
+          "course_credits": 3,
+          "prerequisites": [
+              "数据库管理系统",
+              "统计学"
+          ]
+      },
+      {
+          "course_name": "大数据技术",
+          "course_credits": 3,
+          "prerequisites": [
+              "数据结构与算法",
+              "数据库管理系统"
+          ]
+      },
+      {
+          "course_name": "物联网",
+          "course_credits": 3,
+          "prerequisites": [
+              "计算机网络"
+          ]
+      },
+      {
+          "course_name": "区块链技术",
+          "course_credits": 3,
+          "prerequisites": [
+              "数据结构与算法"
+          ]
+      },
+      {
+          "course_name": "自然语言处理",
+          "course_credits": 3,
+          "prerequisites": [
+              "机器学习",
+              "数据结构与算法"
+          ]
+      },
+      {
+          "course_name": "机器人学",
+          "course_credits": 3,
+          "prerequisites": [
+              "人工智能"
+          ]
+      },
+      {
+          "course_name": "生物信息学",
+          "course_credits": 3,
+          "prerequisites": [
+              "数据结构与算法",
+              "生物学基础"
+          ]
+      },
+      {
+          "course_name": "数字图像处理",
+          "course_credits": 3,
+          "prerequisites": [
+              "数据结构与算法"
+          ]
+      },
+      {
+          "course_name": "增强现实",
+          "course_credits": 3,
+          "prerequisites": [
+              "虚拟现实",
+              "计算机图形学"
+          ]
+      },
+      {
+          "course_name": "无线网络技术",
+          "course_credits": 3,
+          "prerequisites": [
+              "计算机网络"
+          ]
+      },
+      {
+          "course_name": "嵌入式系统设计",
+          "course_credits": 3,
+          "prerequisites": [
+              "计算机组织与架构"
+          ]
+      },
+      {
+          "course_name": "高级数据库系统",
+          "course_credits": 3,
+          "prerequisites": [
+              "数据库管理系统"
+          ]
+      },
+      {
+          "course_name": "图论及其应用",
+          "course_credits": 3,
+          "prerequisites": [
+              "离散数学"
+          ]
       }
-    ]
-  }
-  
+  ]
+}

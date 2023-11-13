@@ -139,6 +139,9 @@ class MainWindow(QMainWindow):
             divisions = generate_course_divisions(max_credits)
 
             if divisions:
+                # Clear all the previous result
+                for box in self.semester_boxes:
+                    box.clear()
                 # Update each word box with the courses for each semester
                 for i, division in enumerate(divisions):
                     course_names = [course.course_name for course in division]
