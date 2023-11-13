@@ -32,7 +32,7 @@ class DAG:
     def is_dag(self):
         return nx.is_directed_acyclic_graph(self.dag)
     
-    def topological_division(self):
+    def topological_division(self, max_credits=16):
         if not self.is_dag():
             return None
 
@@ -56,8 +56,8 @@ class DAG:
                 # Calculate the total credits of courses in the current semester
                 total_credits_in_semester = sum([course.credits for course in current_semester_courses])
 
-                # Check if adding the next course will exceed the 14-credit limit
-                if total_credits_in_semester + node.credits <= 14:
+                # Check if adding the next course will exceed the max credit limit
+                if total_credits_in_semester + node.credits <= max_credits:
                     # Add the course to the current semester
                     current_semester_courses.append(node)
                     current_semester_credits += node.credits

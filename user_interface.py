@@ -136,7 +136,7 @@ class MainWindow(QMainWindow):
         if result == QDialog.Accepted:
             max_credits = dialog.selected_credits()
         
-            divisions = generate_course_divisions()
+            divisions = generate_course_divisions(max_credits)
 
             if divisions:
                 # Update each word box with the courses for each semester
@@ -163,7 +163,7 @@ class MaxCreditDialog(QDialog):
         
         # Create the combo box that select max credits
         self.creditComboBox = QComboBox()
-        for i in range(16, 26):  # Add credit options from 16 to 25
+        for i in range(16, 36):  # Add credit options from 16 to 35
             self.creditComboBox.addItem(str(i))
             
         # Create the confirm and cancel button
