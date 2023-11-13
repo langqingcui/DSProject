@@ -61,7 +61,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("Course Planner")
+        self.setWindowTitle("课程编排系统-主界面")
         self.resize(800, 600)
 
         # Main horizontal layout
@@ -72,17 +72,17 @@ class MainWindow(QMainWindow):
         button_layout.setSpacing(10)
 
         # Import button
-        self.import_button = QPushButton("Import")
+        self.import_button = QPushButton("导入课程")
         button_layout.addWidget(self.import_button)
         self.import_button.clicked.connect(self.import_data)
 
         # Generate button
-        self.generate_button = QPushButton("Generate")
+        self.generate_button = QPushButton("开始排课")
         button_layout.addWidget(self.generate_button)
         self.generate_button.clicked.connect(self.generate_division)
 
         # Export button
-        self.export_button = QPushButton("Export")
+        self.export_button = QPushButton("导出排课")
         button_layout.addWidget(self.export_button)
         self.export_button.clicked.connect(self.export_data)
         
@@ -97,7 +97,7 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(button_widget)
 
         # GroupBox for semester text areas
-        semester_group_box = QGroupBox("Semesters")
+        semester_group_box = QGroupBox("学期")
         semester_layout = QVBoxLayout()
 
         # Text boxes for semesters
@@ -105,7 +105,7 @@ class MainWindow(QMainWindow):
         for i in range(8):
             text_edit = QTextEdit()
             text_edit.setReadOnly(True)
-            text_edit.setPlaceholderText(f"Semester {i+1}")
+            text_edit.setPlaceholderText(f"第{i+1}学期")
             self.semester_boxes.append(text_edit)
             semester_layout.addWidget(text_edit)
 
