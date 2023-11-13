@@ -5,8 +5,11 @@ from PySide6.QtWidgets import (
     QLineEdit, 
     QPushButton, 
     QVBoxLayout,
+    QHBoxLayout,
     QMainWindow,
     QMessageBox,
+    QTextEdit,
+    QGroupBox
     )
 from PySide6.QtGui import QPixmap
 
@@ -52,21 +55,81 @@ class LoginWindow(QMainWindow):
             self.close()
         else:
             QMessageBox.warning(self, "错误", "用户名或密码错误！")
-            
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        
-        self.setWindowTitle("课程编排系统-主界面")
-        self.setGeometry(200, 100, 600, 600)
-        
-        label = QLabel("欢迎来到主界面！")
-        layout = QVBoxLayout()
-        layout.addWidget(label)
 
+        self.setWindowTitle("Course Planner")
+        self.setGeometry(100, 100, 800, 600)
+
+        # Main horizontal layout
+        main_layout = QHBoxLayout()
+
+        # Button area layout
+        button_layout = QVBoxLayout()
+        button_layout.setSpacing(10)
+
+        # Import button
+        self.import_button = QPushButton("Import")
+        button_layout.addWidget(self.import_button)
+        self.import_button.clicked.connect(self.import_data)
+
+        # Generate button
+        self.generate_button = QPushButton("Generate")
+        button_layout.addWidget(self.generate_button)
+        self.generate_button.clicked.connect(self.generate_division)
+
+        # Export button
+        self.export_button = QPushButton("Export")
+        button_layout.addWidget(self.export_button)
+        self.export_button.clicked.connect(self.export_data)
+        
+        button_layout.addStretch()
+
+        # Widget to hold the buttons
+        button_widget = QWidget()
+        button_widget.setLayout(button_layout)
+        button_widget.setFixedWidth(100)  # Set a fixed width for the button area
+
+        # Add the button layout to the main layout
+        main_layout.addWidget(button_widget)
+
+        # GroupBox for semester text areas
+        semester_group_box = QGroupBox("Semesters")
+        semester_layout = QVBoxLayout()
+
+        # Text boxes for semesters
+        self.semester_boxes = []
+        for i in range(8):
+            text_edit = QTextEdit()
+            text_edit.setReadOnly(True)
+            text_edit.setPlaceholderText(f"Semester {i+1}")
+            self.semester_boxes.append(text_edit)
+            semester_layout.addWidget(text_edit)
+
+        semester_group_box.setLayout(semester_layout)
+
+        # Add the GroupBox to the main layout
+        main_layout.addWidget(semester_group_box)
+
+        # Central widget setup
         central_widget = QWidget()
-        central_widget.setLayout(layout)
+        central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
+
+    def import_data(self):
+        # Logic to import course info from courses.json
+        pass
+
+    def generate_division(self):
+        # Logic to generate course topological division
+        pass
+
+    def export_data(self):
+        # Logic to export the topological division to an excel
+        pass
+
 
 if __name__ == '__main__':
     app = QApplication([])
