@@ -82,6 +82,11 @@ class MainWindow(QMainWindow):
         self.generate_button = QPushButton("开始排课")
         button_layout.addWidget(self.generate_button)
         self.generate_button.clicked.connect(self.generate_division)
+        
+        # Adjust button
+        self.adjust_button = QPushButton("调整排课")
+        button_layout.addWidget(self.adjust_button)
+        self.adjust_button.clicked.connect(self.adjust_division)
 
         # Export button
         self.export_button = QPushButton("导出排课")
@@ -149,6 +154,9 @@ class MainWindow(QMainWindow):
             else:
                 print("Unable to generate course divisions.")
 
+    def adjust_division(self):
+        pass
+    
     def export_data(self):
         pass
     
