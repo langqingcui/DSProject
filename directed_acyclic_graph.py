@@ -83,7 +83,7 @@ class DAG:
         # 检查是否所有课程都被分配了
         if self.dag.nodes:
             unassigned_courses = [node.course_name for node in self.dag.nodes]
-            return None, f"Some courses could not be assigned: {', '.join(unassigned_courses)}"
+            return None, f"生成失败！以下课程无法被排入： {', '.join(unassigned_courses)}"
 
         return divisions, None
 
@@ -142,7 +142,7 @@ class DAG:
             
         if self.dag.nodes:
             unassigned_courses = [node.course_name for node in self.dag.nodes]
-            return None, f"Some courses could not be assigned: {', '.join(unassigned_courses)}"
+            return None, f"调整失败！以下课程无法被排入计划：{', '.join(unassigned_courses)}"
 
         return divisions, None
 
