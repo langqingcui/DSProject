@@ -9,4 +9,5 @@ def generate_course_divisions(max_credits):
     else:
         print("The graph is not a DAG.")
         return None, None
-
+ 
+ 

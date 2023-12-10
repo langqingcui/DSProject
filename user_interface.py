@@ -20,6 +20,7 @@ from courses_topological_division import generate_course_divisions
 import json
 
 max_credits_per_semester = []
+courses_to_reschedule = []
 
 class LoginWindow(QMainWindow):
     def __init__(self):
@@ -326,23 +327,25 @@ class AdjustCourseDialog(QDialog):
     def set_course_semester(self, course_name, new_semester):
         course_to_set = next((c for c in self.dag.get_nodes() if c.course_name == course_name), None)
         if course_to_set:
-            course_to_set.set_semester(new_semester + 1)
+            course_to_set.set_semester(new_semester)
         else:
             raise ValueError(f"Course {course_name} not found")
           
     def rescheduleCourse(self):
         # -1是因为前面有默认值
-        current_semester = self.semesterComboBox.currentIndex() - 1
-        target_semester = self.targetSemesterComboBox.currentIndex() - 1
+        current_semester = self.semesterComboBox.currentIndex()
+        target_semester = self.targetSemesterComboBox.currentIndex()
         course_to_reschedule = self.courseComboBox.currentText()
+        courses_to_reschedule.append((course_to_reschedule, target_semester))
         # 如果选择默认值则报错
-        if current_semester < 0 or target_semester < 0 or course_to_reschedule == "--课程--":
+        if current_semester < 1 or target_semester < 1 or course_to_reschedule == "--课程--":
             QMessageBox.warning(self, "错误", "请选择有效的学期和课程")
-            return
+            return None, None
         
         try:
             # 更新调整课程的学期属性
-            self.set_course_semester(course_to_reschedule, target_semester)
+            for course_name, target_semester in courses_to_reschedule:
+                self.set_course_semester(course_name, target_semester)
             
             # 重新拓扑排序
             new_divisions, error = self.dag.topological_division_adjusting_courses(max_credits_per_semester)
@@ -351,6 +354,7 @@ class AdjustCourseDialog(QDialog):
             
         except Exception as e:
             QMessageBox.warning(self, "调整失败", f"调整课程时发生错误: {str(e)}")
+            return None, str(e)
             
         
         
