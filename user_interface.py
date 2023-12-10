@@ -145,8 +145,12 @@ class MainWindow(QMainWindow):
             global max_credits_per_semester
             max_credits_per_semester = dialog.get_max_credits()
         
-            divisions = generate_course_divisions(max_credits_per_semester)
+            divisions, error = generate_course_divisions(max_credits_per_semester)
 
+            if error:
+                QMessageBox.warning(self, "排课错误", error)
+                return
+            
             if divisions:
                 # Clear all the previous result
                 for box in self.semester_boxes:
@@ -179,7 +183,11 @@ class MainWindow(QMainWindow):
             
         dialog = AdjustCourseDialog(divisions)
         if dialog.exec() == QDialog.Accepted:
-            new_divisions = dialog.rescheduleCourse()
+            new_divisions, error = dialog.rescheduleCourse()
+            
+            if error:
+                QMessageBox.warning(self, "排课错误", error)
+                return
             
             if new_divisions:
                 # Clear all the previous result
@@ -337,9 +345,9 @@ class AdjustCourseDialog(QDialog):
             self.set_course_semester(course_to_reschedule, target_semester)
             
             # 重新拓扑排序
-            new_divisions = self.dag.topological_division_adjusting_courses(max_credits_per_semester)
+            new_divisions, error = self.dag.topological_division_adjusting_courses(max_credits_per_semester)
             
-            return new_divisions
+            return new_divisions, error
             
         except Exception as e:
             QMessageBox.warning(self, "调整失败", f"调整课程时发生错误: {str(e)}")

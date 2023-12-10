@@ -8,5 +8,5 @@ def generate_course_divisions(max_credits):
         return dag.topological_division(max_credits)
     else:
         print("The graph is not a DAG.")
-        return None
+        return None, None
 

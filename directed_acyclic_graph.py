@@ -37,7 +37,7 @@ class DAG:
     
     def topological_division(self, max_credits_per_semester):
         if not self.is_dag():
-            return None
+            return None, "Graph is not a Directed Acyclic Graph (DAG)."
 
         # List to store nodes at each division
         divisions = []
@@ -79,13 +79,19 @@ class DAG:
             divisions.append(current_semester_courses)
             
             semester += 1
+            
+        # 检查是否所有课程都被分配了
+        if self.dag.nodes:
+            unassigned_courses = [node.course_name for node in self.dag.nodes]
+            return None, f"Some courses could not be assigned: {', '.join(unassigned_courses)}"
 
-        return divisions
+        return divisions, None
+
        
 
     def topological_division_adjusting_courses(self, max_credits_per_semester):
         if not self.is_dag():
-            return None
+            return None, "Graph is not a Directed Acyclic Graph (DAG)."
 
         divisions = [[] for _ in range(8)]
         current_semester_credits = [0 for _ in range(8)]
@@ -106,9 +112,9 @@ class DAG:
         while semester <= 8:
             zero_in_degree_nodes = [node for node, in_degree in self.dag.in_degree() if in_degree == 0]
 
-            print(f"Semester {semester} zero in-degree courses:")
-            for node in zero_in_degree_nodes:
-                print(node.course_name)
+            # print(f"Semester {semester} zero in-degree courses:")
+            # for node in zero_in_degree_nodes:
+            #     print(node.course_name)
                 
             if not zero_in_degree_nodes:
                 break  # 退出条件: 没有可分配的课程
@@ -116,17 +122,10 @@ class DAG:
             max_credits = max_credits_per_semester[semester - 1]
             
             for course in courses_with_set_semesters:
-                # if course.semester == semester:
-                print(f"111, {course}")
                 if course in zero_in_degree_nodes:
-                    zero_in_degree_nodes.remove(course)
-                    # self.dag.remove_node(course)
-                    # courses_with_set_semesters.remove(course)
-                    
-                    
+                    zero_in_degree_nodes.remove(course)                  
 
-
-            for node in list(zero_in_degree_nodes):
+            for node in zero_in_degree_nodes:
                 if current_semester_credits[semester - 1] + node.credits <= max_credits:
                     divisions[semester - 1].append(node)
                     current_semester_credits[semester - 1] += node.credits
@@ -134,14 +133,18 @@ class DAG:
                 else:
                     break
                 
-            for course in list(courses_with_set_semesters):
+            for course in courses_with_set_semesters:
                 if course.semester == semester:
                     self.dag.remove_node(course)
                     courses_with_set_semesters.remove(course)
 
             semester += 1
-         
-        return divisions
+            
+        if self.dag.nodes:
+            unassigned_courses = [node.course_name for node in self.dag.nodes]
+            return None, f"Some courses could not be assigned: {', '.join(unassigned_courses)}"
+
+        return divisions, None
 
 
                 
