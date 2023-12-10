@@ -15,8 +15,11 @@ from PySide6.QtWidgets import (
     QComboBox
     )
 from PySide6.QtGui import QPixmap
+from directed_acyclic_graph import DAG
 from courses_topological_division import generate_course_divisions
 import json
+
+max_credits_per_semester = []
 
 class LoginWindow(QMainWindow):
     def __init__(self):
@@ -139,6 +142,7 @@ class MainWindow(QMainWindow):
     def generate_division(self):
         dialog = MaxCreditDialog(self)
         if dialog.exec() == QDialog.Accepted:
+            global max_credits_per_semester
             max_credits_per_semester = dialog.get_max_credits()
         
             divisions = generate_course_divisions(max_credits_per_semester)
@@ -174,8 +178,22 @@ class MainWindow(QMainWindow):
             divisions.append(courses)
             
         dialog = AdjustCourseDialog(divisions)
-        dialog.exec()
-        
+        if dialog.exec() == QDialog.Accepted:
+            new_divisions = dialog.rescheduleCourse()
+            
+            if new_divisions:
+                # Clear all the previous result
+                for box in self.semester_boxes:
+                    box.clear()
+                # Update each word box with the courses for each semester
+                for i, division in enumerate(new_divisions):
+                    if i < len(self.semester_boxes):
+                        course_names = [course.course_name for course in division]
+                        self.semester_boxes[i].setPlainText('，'.join(course_names))
+                    else:
+                        break
+            else:
+                print("Unable to generate course divisions.")
             
             
     
@@ -237,26 +255,29 @@ class MaxCreditDialog(QDialog):
 class AdjustCourseDialog(QDialog):
     def __init__(self, divisions, parent=None):
         super(AdjustCourseDialog, self).__init__(parent)
+        
+        self.dag = DAG()
+        self.dag.add_courses_from_json("courses.json")
 
         self.setWindowTitle("调整排课")
         self.divisions = divisions
 
-        # 设置标签和下拉框
+        # Create labels and combo boxes
         self.label = QLabel("请选择课程")
         self.semesterComboBox = QComboBox()
         self.courseComboBox = QComboBox()
         self.targetSemesterComboBox = QComboBox()
 
-        # 初始化下拉框的默认选项
+        # Default options for combo boxes
         self.semesterComboBox.addItem("--学期--")
         self.courseComboBox.addItem("--课程--")
         self.targetSemesterComboBox.addItem("--目标学期--")
 
-        # 填充学期下拉框
+        # Fill the semester combobox
         for i in range(1, 9):
             self.semesterComboBox.addItem(f"第{i}学期")
 
-        # 为学期下拉框添加事件监听
+        # Signal of semesterComboBox
         self.semesterComboBox.currentIndexChanged.connect(self.onSemesterChanged)
         
         # Create the confirm and cancel button
@@ -294,7 +315,13 @@ class AdjustCourseDialog(QDialog):
         for i in range(1, 9):
             self.targetSemesterComboBox.addItem(f"第{i}学期")
             
-    
+    def set_course_semester(self, course_name, new_semester):
+        course_to_set = next((c for c in self.dag.get_nodes() if c.course_name == course_name), None)
+        if course_to_set:
+            course_to_set.set_semester(new_semester + 1)
+        else:
+            raise ValueError(f"Course {course_name} not found")
+          
     def rescheduleCourse(self):
         # -1是因为前面有默认值
         current_semester = self.semesterComboBox.currentIndex() - 1
@@ -305,6 +332,18 @@ class AdjustCourseDialog(QDialog):
             QMessageBox.warning(self, "错误", "请选择有效的学期和课程")
             return
         
+        try:
+            # 更新调整课程的学期属性
+            self.set_course_semester(course_to_reschedule, target_semester)
+            
+            # 重新拓扑排序
+            new_divisions = self.dag.topological_division_adjusting_courses(max_credits_per_semester)
+            
+            return new_divisions
+            
+        except Exception as e:
+            QMessageBox.warning(self, "调整失败", f"调整课程时发生错误: {str(e)}")
+            
         
         
 if __name__ == '__main__':
