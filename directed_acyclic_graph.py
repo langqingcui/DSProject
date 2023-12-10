@@ -32,12 +32,14 @@ class DAG:
     def is_dag(self):
         return nx.is_directed_acyclic_graph(self.dag)
     
-    def topological_division(self, max_credits=16):
+    def topological_division(self, max_credits_per_semester):
         if not self.is_dag():
             return None
 
         # List to store nodes at each division
         divisions = []
+        
+        semester = 1
 
         while True:
             # Find nodes with in-degrees of 0
@@ -51,6 +53,8 @@ class DAG:
             # Initialize variables to keep track of credits and courses in the current semester
             current_semester_credits = 0
             current_semester_courses = []
+            
+            max_credits = max_credits_per_semester[semester - 1]
 
             for node in zero_in_degree_nodes:
                 # Calculate the total credits of courses in the current semester
@@ -63,12 +67,18 @@ class DAG:
                     current_semester_credits += node.credits
                 else:
                     break  # Break if the credit limit is reached
+            
+            # Assign semester attribute to courses    
+            for course in current_semester_courses:
+                course.set_semester(semester)
 
             # Remove the courses that are already planned for current semester
             self.dag.remove_nodes_from(current_semester_courses)
 
             # Store the current semester's courses in divisions
             divisions.append(current_semester_courses)
+            
+            semester += 1
 
         return divisions
 

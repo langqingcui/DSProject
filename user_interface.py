@@ -11,10 +11,12 @@ from PySide6.QtWidgets import (
     QTextEdit,
     QGroupBox,
     QDialog,
+    QFileDialog,
     QComboBox
     )
 from PySide6.QtGui import QPixmap
 from courses_topological_division import generate_course_divisions
+import json
 
 class LoginWindow(QMainWindow):
     def __init__(self):
@@ -136,12 +138,10 @@ class MainWindow(QMainWindow):
 
     def generate_division(self):
         dialog = MaxCreditDialog(self)
-        result = dialog.exec()
+        if dialog.exec() == QDialog.Accepted:
+            max_credits_per_semester = dialog.get_max_credits()
         
-        if result == QDialog.Accepted:
-            max_credits = dialog.selected_credits()
-        
-            divisions = generate_course_divisions(max_credits)
+            divisions = generate_course_divisions(max_credits_per_semester)
 
             if divisions:
                 # Clear all the previous result
@@ -155,10 +155,45 @@ class MainWindow(QMainWindow):
                 print("Unable to generate course divisions.")
 
     def adjust_division(self):
-        pass
+        divisions = []
+        no_division_yet = True
+        
+        for box in self.semester_boxes:
+            if box.toPlainText().strip():
+                no_division_yet = False
+                break
+        
+        if no_division_yet:
+            # Error if all word boxes are empty
+            QMessageBox.warning(self, "错误", "当前没有划分，请先生成课程划分！")
+            return
+        
+        for box in self.semester_boxes:
+            content = box.toPlainText().strip()
+            courses = content.split('，') if content else []
+            divisions.append(courses)
+            
+        dialog = AdjustCourseDialog(divisions)
+        dialog.exec()
+        
+            
+            
     
     def export_data(self):
-        pass
+        # 选择保存文件的位置
+        file_name, _ = QFileDialog.getSaveFileName(self, "保存文件", "", "文本文件 (*.txt)")
+        if not file_name:
+            return  # 用户取消了保存
+
+        try:
+            with open(file_name, 'w', encoding='utf-8') as file:
+                for i, semester_box in enumerate(self.semester_boxes, start=1):
+                    courses = semester_box.toPlainText().strip()
+                    if courses:
+                        file.write(f"第{i}学期:\n{courses}\n\n")
+            QMessageBox.information(self, "导出成功", "课程安排已成功导出到文本文件。")
+        except Exception as e:
+            QMessageBox.warning(self, "导出失败", f"导出过程中发生错误: {e}")
     
     def clearAllWordBoxes(self):
         for box in self.semester_boxes:
@@ -167,43 +202,111 @@ class MainWindow(QMainWindow):
 class MaxCreditDialog(QDialog):
     def __init__(self, parent=None):
         super(MaxCreditDialog, self).__init__(parent)
+        self.setWindowTitle("设置每学期最大课时数")
+
+        self.credit_comboboxes = []
+        main_layout = QVBoxLayout()
+
+        for i in range(1, 9):
+            hbox = QHBoxLayout()
+            label = QLabel(f"第{i}学期最大课时数：")
+            combobox = QComboBox()
+            for j in range(16, 25):  # credit ranges from 16 to 25
+                combobox.addItem(str(j))
+            self.credit_comboboxes.append(combobox)
+            hbox.addWidget(label)
+            hbox.addWidget(combobox)
+            main_layout.addLayout(hbox)
+
+        # Buttons
+        self.confirmButton = QPushButton("确定")
+        self.confirmButton.clicked.connect(self.accept)
+        self.cancelButton = QPushButton("取消")
+        self.cancelButton.clicked.connect(self.reject)
+
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(self.confirmButton)
+        button_layout.addWidget(self.cancelButton)
+
+        main_layout.addLayout(button_layout)
+        self.setLayout(main_layout)
+
+    def get_max_credits(self):
+        return [int(combobox.currentText()) for combobox in self.credit_comboboxes]
+
+class AdjustCourseDialog(QDialog):
+    def __init__(self, divisions, parent=None):
+        super(AdjustCourseDialog, self).__init__(parent)
+
+        self.setWindowTitle("调整排课")
+        self.divisions = divisions
+
+        # 设置标签和下拉框
+        self.label = QLabel("请选择课程")
+        self.semesterComboBox = QComboBox()
+        self.courseComboBox = QComboBox()
+        self.targetSemesterComboBox = QComboBox()
+
+        # 初始化下拉框的默认选项
+        self.semesterComboBox.addItem("--学期--")
+        self.courseComboBox.addItem("--课程--")
+        self.targetSemesterComboBox.addItem("--目标学期--")
+
+        # 填充学期下拉框
+        for i in range(1, 9):
+            self.semesterComboBox.addItem(f"第{i}学期")
+
+        # 为学期下拉框添加事件监听
+        self.semesterComboBox.currentIndexChanged.connect(self.onSemesterChanged)
         
-        self.setWindowTitle("学分数")
-        
-        label = QLabel("每学期最大学分：")
-        
-        # Create the combo box that select max credits
-        self.creditComboBox = QComboBox()
-        for i in range(16, 36):  # Add credit options from 16 to 35
-            self.creditComboBox.addItem(str(i))
-            
         # Create the confirm and cancel button
         self.confirmButton = QPushButton("确定")
         self.confirmButton.clicked.connect(self.accept)
         self.cancelButton = QPushButton("取消")
         self.cancelButton.clicked.connect(self.reject)
+
+        # layout
+        comboboxLayout = QHBoxLayout()
+        comboboxLayout.addWidget(self.semesterComboBox)
+        comboboxLayout.addWidget(self.courseComboBox)
+        comboboxLayout.addWidget(self.targetSemesterComboBox)
         
-        # Layout for the combo box and label
-        comboLayout = QHBoxLayout()
-        comboLayout.addWidget(label)
-        comboLayout.addWidget(self.creditComboBox)
-        
-        # Layout for buttons
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(self.confirmButton)
         buttonLayout.addWidget(self.cancelButton)
         
-        # Main layout
         mainLayout = QVBoxLayout()
-        mainLayout.addLayout(comboLayout)
-        mainLayout.addLayout(buttonLayout)
+        mainLayout.addWidget(self.label)
+        mainLayout.addLayout(comboboxLayout)
+        mainLayout.addLayout(buttonLayout)        
         
         self.setLayout(mainLayout)
 
-    def selected_credits(self):
-        return int(self.creditComboBox.currentText())
-
-
+    def onSemesterChanged(self, index):
+        # 清空课程下拉框并重新填充
+        self.courseComboBox.clear()
+        self.courseComboBox.addItem("--课程--")
+        if index > 0 and index <= len(self.divisions):
+            for course in self.divisions[index - 1]:
+                self.courseComboBox.addItem(course)
+        
+        # 填充目标学期下拉框
+        for i in range(1, 9):
+            self.targetSemesterComboBox.addItem(f"第{i}学期")
+            
+    
+    def rescheduleCourse(self):
+        # -1是因为前面有默认值
+        current_semester = self.semesterComboBox.currentIndex() - 1
+        target_semester = self.targetSemesterComboBox.currentIndex() - 1
+        course_to_reschedule = self.courseComboBox.currentText()
+        # 如果选择默认值则报错
+        if current_semester < 0 or target_semester < 0 or course_to_reschedule == "--课程--":
+            QMessageBox.warning(self, "错误", "请选择有效的学期和课程")
+            return
+        
+        
+        
 if __name__ == '__main__':
     app = QApplication([])
     window = LoginWindow()
