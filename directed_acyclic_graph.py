@@ -1,6 +1,7 @@
 import networkx as nx
 import json
 from course import Course
+from PySide6.QtWidgets import QMessageBox
 
 class DAG:
     def __init__(self):
@@ -26,8 +27,8 @@ class DAG:
                         prereq = next((c for c in self.dag.nodes if c.course_name == prereq_name), None)
                         if prereq:
                             self.add_prerequisite(prereq, course)
-        except FileNotFoundError:
-            print(f"File '{json_file} not found!")
+        except Exception as e:
+            QMessageBox.warning(self, "处理错误", f"处理文件时发生错误: {e}")
 
     def is_dag(self):
         return nx.is_directed_acyclic_graph(self.dag)
@@ -111,20 +112,18 @@ class DAG:
 
         while semester <= 8:
             zero_in_degree_nodes = [node for node, in_degree in self.dag.in_degree() if in_degree == 0]
-
-            # print(f"Semester {semester} zero in-degree courses:")
-            # for node in zero_in_degree_nodes:
-            #     print(node.course_name)
                 
             if not zero_in_degree_nodes:
                 break  # 退出条件: 没有可分配的课程
             
             max_credits = max_credits_per_semester[semester - 1]
             
+            # 从零入度课程列表中删除待调整课程
             for course in courses_with_set_semesters:
                 if course in zero_in_degree_nodes:
                     zero_in_degree_nodes.remove(course)                  
 
+            # 将零入度课程加入division
             for node in zero_in_degree_nodes:
                 if current_semester_credits[semester - 1] + node.credits <= max_credits:
                     divisions[semester - 1].append(node)
@@ -132,7 +131,8 @@ class DAG:
                     self.dag.remove_node(node)
                 else:
                     break
-                
+            
+            # 后删除调整课程，保证semester+=1后的学期才会出现后继课程
             for course in courses_with_set_semesters:
                 if course.semester == semester:
                     self.dag.remove_node(course)

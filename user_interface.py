@@ -136,17 +136,29 @@ class MainWindow(QMainWindow):
         central_widget = QWidget()
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
+        
+        # Data directory
+        self.selected_json_file = ""
 
     def import_data(self):
-        pass
+        file_name, _ = QFileDialog.getOpenFileName(self, "打开文件", "", "JSON 文件 (*.json)")
+        if not file_name:
+            return  # 用户取消了操作
+        self.selected_json_file = file_name
+        QMessageBox.information(self, "文件选中", "文件已成功选中。")
 
     def generate_division(self):
+        # No input file error
+        if self.selected_json_file == "":
+            QMessageBox.warning(self, "生成失败", "没有选择课程数据文件！")
+            return
+        
         dialog = MaxCreditDialog(self)
         if dialog.exec() == QDialog.Accepted:
             global max_credits_per_semester
             max_credits_per_semester = dialog.get_max_credits()
         
-            divisions, error = generate_course_divisions(max_credits_per_semester)
+            divisions, error = generate_course_divisions(max_credits_per_semester, self.selected_json_file)
 
             if error:
                 QMessageBox.warning(self, "排课错误", error)
@@ -207,6 +219,11 @@ class MainWindow(QMainWindow):
             
     
     def export_data(self):
+        # 检查所有的 semester_boxes 是否都是空的
+        if all(not box.toPlainText().strip() for box in self.semester_boxes):
+            QMessageBox.warning(self, "导出失败", "没有课程数据可导出。")
+            return
+        
         # 选择保存文件的位置
         file_name, _ = QFileDialog.getSaveFileName(self, "保存文件", "", "文本文件 (*.txt)")
         if not file_name:
@@ -223,8 +240,15 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "导出失败", f"导出过程中发生错误: {e}")
     
     def clearAllWordBoxes(self):
+        # 清空文字框
         for box in self.semester_boxes:
             box.clear()
+        
+        # 清空每学期最大学分数
+        max_credits_per_semester = []
+        
+        # 调整课程清空
+        courses_to_reschedule = []
 
 class MaxCreditDialog(QDialog):
     def __init__(self, parent=None):
