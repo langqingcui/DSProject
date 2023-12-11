@@ -160,6 +160,21 @@ class MainWindow(QMainWindow):
         file_name, _ = QFileDialog.getOpenFileName(self, "打开文件", "", "JSON 文件 (*.json)")
         if not file_name:
             return  # 用户取消了操作
+        
+        # 判断是否是computer science courses
+        try:
+            with open(file_name, 'r') as file:
+                data = json.load(file)
+                if "computer_science_courses" not in data:
+                    QMessageBox.warning(self, "错误", "JSON 文件格式错误，缺少 'computer_science_courses' 键。")
+                    return
+        except json.JSONDecodeError:
+            QMessageBox.warning(self, "错误", "无法解析 JSON 文件。")
+            return
+        except FileNotFoundError:
+            QMessageBox.warning(self, "错误", "文件未找到。")
+            return
+        
         self.selected_json_file = file_name
         QMessageBox.information(self, "文件选中", "文件已成功选中。")
 
