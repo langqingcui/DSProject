@@ -26,6 +26,7 @@ class LoginWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        # Set login window appearances
         self.setWindowTitle('课程编排系统-登录')
         self.resize(300, 150)
         
@@ -53,12 +54,27 @@ class LoginWindow(QMainWindow):
         central_widget = QWidget()
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
+        
+        # Load users data from json file
+        self.users = self.load_users()
+    
+    def load_users(self):
+        try:
+            with open('users.json', 'r') as file:
+                data = json.load(file)
+                return data['users']
+        except FileNotFoundError:
+            QMessageBox.warning(self, "错误", "用户数据文件未找到！")
+            return []
+        except json.JSONDecodeError:
+            QMessageBox.warning(self, "错误", "用户数据文件格式错误！")
+            return []
 
     def on_login_clicked(self):
         username = self.username_input.text()
         password = self.password_input.text()
 
-        if username == 'admin' and password == '111':
+        if any(user['username'] == username and user['password'] == password for user in self.users):
             self.main_window = MainWindow()
             self.main_window.show()
             self.close()
