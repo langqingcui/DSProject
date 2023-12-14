@@ -115,6 +115,11 @@ class MainWindow(QMainWindow):
         button_layout.addWidget(self.export_button)
         self.export_button.clicked.connect(self.export_data)
         
+        # Read arrangement
+        self.read_arrangement_button = QPushButton("读入排布")
+        button_layout.addWidget(self.read_arrangement_button)
+        self.read_arrangement_button.clicked.connect(self.read_arrangement)
+        
         # Clear button
         self.clear_button = QPushButton("清空排课")
         button_layout.addWidget(self.clear_button)
@@ -155,6 +160,9 @@ class MainWindow(QMainWindow):
         
         # Data directory
         self.selected_json_file = ""
+        
+        # DAG
+        self.dag = DAG()
 
     def import_data(self):
         file_name, _ = QFileDialog.getOpenFileName(self, "打开文件", "", "JSON 文件 (*.json)")
@@ -266,9 +274,93 @@ class MainWindow(QMainWindow):
                     courses = semester_box.toPlainText().strip()
                     if courses:
                         file.write(f"第{i}学期:\n{courses}\n\n")
+                
+                # 追加调整过的课程和对应的学期
+                if courses_to_reschedule:
+                    file.write("\n调整过的课程:\n")
+                    for course, semester in courses_to_reschedule:
+                        file.write(f"{course} - 第{semester}学期\n")
+                
+                if max_credits_per_semester:
+                    file.write("\n每学期最大课时数:\n")
+                    for i, credits in enumerate(max_credits_per_semester, start=1):
+                        file.write(f"第{i}学期: {credits}课时\n")
+                        
             QMessageBox.information(self, "导出成功", "课程安排已成功导出到文本文件。")
         except Exception as e:
             QMessageBox.warning(self, "导出失败", f"导出过程中发生错误: {e}")
+    
+    def read_arrangement(self):
+        file_name, _ = QFileDialog.getOpenFileName(self, "打开文件", "", "文本文件 (*.txt)")
+        if not file_name:
+            return  # 用户取消了操作
+
+        try:
+            with open(file_name, 'r', encoding='utf-8') as file:
+                lines = file.readlines()
+
+            # 重置 semester_boxes 和 courses_to_reschedule
+            for box in self.semester_boxes:
+                box.clear()
+            global courses_to_reschedule, max_credits_per_semester
+            courses_to_reschedule = []
+            max_credits_per_semester = []
+
+            # 读入排布
+            current_semester = -10
+            max_credits_mode = False
+            for line in lines:
+                line = line.strip()
+                if line.startswith("第") and line.endswith("学期:"):
+                    current_semester = int(line[1:-3]) - 1
+                elif line and current_semester >= 0 and current_semester < len(self.semester_boxes):
+                    self.semester_boxes[current_semester].append(line)
+                    current_semester = -10
+                elif line.startswith("调整过的课程:"):
+                    current_semester = -1  # 进入调整课程模式
+                elif line.startswith("每学期最大课时数:"):
+                    max_credits_mode = True  # 进入最大学分模式
+                elif max_credits_mode:
+                    if line:
+                        parts = line.split(': ')
+                        if len(parts) == 2:
+                            semester, credits_str = parts
+                            credits = int(credits_str[0:2])
+                            max_credits_per_semester.append(credits)
+                elif current_semester == -1:
+                    parts = line.split(' - 第')
+                    if len(parts) == 2:
+                        course, semester_str = parts
+                        semester = int(semester_str[0])
+                        courses_to_reschedule.append((course, semester))
+            
+            if max_credits_mode == False:
+                QMessageBox.warning(self, "错误", "缺少最大学分数！")
+                return
+            
+            # 重建 DAG 并重新生成拓扑划分
+            self.dag = DAG()
+            self.dag.add_courses_from_json("courses.json")
+            for course_name, semester in courses_to_reschedule:
+                # 找到对应的课程对象
+                course_to_set = next((c for c in self.dag.get_nodes() if c.course_name == course_name), None)
+                if course_to_set:
+                    # 设置课程的学期
+                    course_to_set.set_semester(semester)
+                else:
+                    print(f"Course '{course_name}' not found in DAG")
+            divisions, error = self.dag.topological_division_adjusting_courses(max_credits_per_semester)
+            
+            if error:
+                QMessageBox.warning(self, "重建排课错误", error)
+            else:
+                # 更新 semester_boxes
+                for i, division in enumerate(divisions):
+                    course_names = [course.course_name for course in division]
+                    self.semester_boxes[i].setPlainText('，'.join(course_names))
+
+        except Exception as e:
+            QMessageBox.warning(self, "读入失败", f"读入过程中发生错误: {str(e)}")
     
     def clearAllWordBoxes(self):
         # 清空文字框
